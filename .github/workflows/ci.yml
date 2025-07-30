@@ -1,0 +1,80 @@
+# .github/workflows/ci.yml
+name: MLOps CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test_suite:
+    name: Run Pytest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest tests/
+
+  train_and_quantize:
+    name: Train Model, Quantize, Upload Artifacts
+    runs-on: ubuntu-latest
+    needs: test_suite
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Train model and quantize
+        run: |
+          python src/train.py
+          python src/quantize.py
+
+      - name: Upload model artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-artifacts
+          path: |
+            model.joblib
+            unquant_params.joblib
+            quant_params.joblib
+
+  build_and_test_container:
+    name: Build and Test Docker Container
+    runs-on: ubuntu-latest
+    needs: train_and_quantize
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download model artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: model-artifacts
+          path: .
+
+      - name: Build Docker image
+        run: docker build -t mlops-image .
+
+      - name: Run Docker container and test prediction
+        run: docker run mlops-image python src/predict.py
