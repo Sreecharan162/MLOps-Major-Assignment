@@ -25,7 +25,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run tests
-        run: pytest tests/
+        run: python -m pytest tests/
 
   train_and_quantize:
     name: Train Model, Quantize, Upload Artifacts
@@ -47,8 +47,8 @@ jobs:
 
       - name: Train model and quantize
         run: |
-          python src/train.py
-          python src/quantize.py
+          python -m src.train
+          python -m src.quantize
 
       - name: Upload model artifacts
         uses: actions/upload-artifact@v4
