@@ -107,10 +107,10 @@ if __name__ == "__main__":
     print(dequantized_model.predict(X_test_sample))
 
     # Clean up files created for local testing
-    if os.path.exists('model.joblib'):
-        os.remove('model.joblib')
-    if os.path.exists('unquant_params.joblib'):
-        os.remove('unquant_params.joblib')
-    if os.path.exists('quant_params.joblib'):
-        os.remove('quant_params.joblib')
-    print("\nCleaned up locally generated model and parameter files.")
+    # if os.path.exists('model.joblib'):
+    #     os.remove('model.joblib')
+    # if os.path.exists('unquant_params.joblib'):
+    #     os.remove('unquant_params.joblib')
+    # if os.path.exists('quant_params.joblib'):
+    #     os.remove('quant_params.joblib')
+    # print("\nCleaned up locally generated model and parameter files.")
